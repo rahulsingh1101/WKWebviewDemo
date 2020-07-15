@@ -26,6 +26,13 @@ class WKWebViewDemoTests: XCTestCase {
         vc.webView(vc.webView, decidePolicyFor: fakeAction2, decisionHandler: { receivedPolicy = $0})
         XCTAssertEqual(receivedPolicy, WKNavigationActionPolicy.cancel)
         
+        
+    }
+    
+    func test_RequestWithCancel() {
+        var receivedPolicy: WKNavigationActionPolicy?
+
+        let vc = getVC(storyboardName: "Main",controller: ViewController.init())
         let fakeAction3 = FakeNavigationAction(testRequest: URLRequest.init(url: URL(string: ViewController.Paths.l.rawValue)!))
         vc.webView(vc.webView, decidePolicyFor: fakeAction3, decisionHandler: { receivedPolicy = $0})
         XCTAssertEqual(receivedPolicy, WKNavigationActionPolicy.cancel)
