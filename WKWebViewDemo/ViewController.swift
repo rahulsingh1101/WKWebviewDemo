@@ -23,7 +23,7 @@ class ViewController: UIViewController {
         
         let url = URL(string: Paths.baseUrl.rawValue)!
         webView.load(URLRequest(url: url))
-        webView.allowsBackForwardNavigationGestures = true
+//        webView.allowsBackForwardNavigationGestures = true
     }
 
 
