@@ -8,27 +8,50 @@
 
 import XCTest
 @testable import WKWebViewDemo
+import WebKit
 
 class WKWebViewDemoTests: XCTestCase {
+    
+    func test_RequestPolicy(){
+        var receivedPolicy: WKNavigationActionPolicy?
 
-    override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        let vc = getVC(storyboardName: "Main",controller: ViewController.init())
+        
+        let fakeAction1 = FakeNavigationAction(testRequest: URLRequest.init(url: URL(string: ViewController.Paths.baseUrl.rawValue)!))
+        vc.webView(vc.webView, decidePolicyFor: fakeAction1, decisionHandler: { receivedPolicy = $0})
+        XCTAssertEqual(receivedPolicy, WKNavigationActionPolicy.allow)
+        
+        
+        let fakeAction2 = FakeNavigationAction(testRequest: URLRequest.init(url: URL(string: ViewController.Paths.k.rawValue)!))
+        vc.webView(vc.webView, decidePolicyFor: fakeAction2, decisionHandler: { receivedPolicy = $0})
+        XCTAssertEqual(receivedPolicy, WKNavigationActionPolicy.cancel)
+        
+        let fakeAction3 = FakeNavigationAction(testRequest: URLRequest.init(url: URL(string: ViewController.Paths.l.rawValue)!))
+        vc.webView(vc.webView, decidePolicyFor: fakeAction3, decisionHandler: { receivedPolicy = $0})
+        XCTAssertEqual(receivedPolicy, WKNavigationActionPolicy.cancel)
+        
+        let fakeAction4 = FakeNavigationAction(testRequest: URLRequest.init(url: URL(string: ViewController.Paths.m.rawValue)!))
+        vc.webView(vc.webView, decidePolicyFor: fakeAction4, decisionHandler: { receivedPolicy = $0})
+        XCTAssertEqual(receivedPolicy, WKNavigationActionPolicy.cancel)
+    }
+    
+    private func getVC<T:UIViewController>(storyboardName: String, controller:T)->T{
+        let storyboard: UIStoryboard = UIStoryboard.init(name: storyboardName, bundle: nil)
+        let vc = storyboard.instantiateViewController(withIdentifier: String(describing: T.self)) as! T
+        vc.loadView()
+        return vc
+    }
+}
+
+final class FakeNavigationAction: WKNavigationAction {
+    let testRequest: URLRequest
+    
+    override var request: URLRequest {
+        return testRequest
     }
 
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    init(testRequest: URLRequest) {
+        self.testRequest = testRequest
+        super.init()
     }
-
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
-
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
-    }
-
 }
