@@ -17,29 +17,41 @@ class WKWebViewDemoTests: XCTestCase {
 
         let vc = getVC(storyboardName: "Main",controller: ViewController.init())
         
-        let fakeAction1 = FakeNavigationAction(testRequest: URLRequest.init(url: URL(string: ViewController.Paths.baseUrl.rawValue)!))
-        vc.webView(vc.webView, decidePolicyFor: fakeAction1, decisionHandler: { receivedPolicy = $0})
+        
+        let fakeAction1 = FakeNavigationAction(testRequest: URLRequest.init(url: URL(string: "https://www.walmart.com/plus/address")!))
+        vc.webView(vc.webView, decidePolicyFor: fakeAction1, decisionHandler: { receivedPolicy = $0 })
+        XCTAssertEqual(receivedPolicy, WKNavigationActionPolicy.cancel)
+
+        
+        let fakeAction2 = FakeNavigationAction(testRequest: URLRequest.init(url: URL(string: "https://www.walmart.com/plus/signup")!))
+        vc.webView(vc.webView, decidePolicyFor: fakeAction2, decisionHandler: { receivedPolicy = $0 })
+        XCTAssertEqual(receivedPolicy, WKNavigationActionPolicy.cancel)
+
+        
+        let fakeAction3 = FakeNavigationAction(testRequest: URLRequest.init(url: URL(string: "https://www.walmart.com/plus/trial")!))
+        vc.webView(vc.webView, decidePolicyFor: fakeAction3, decisionHandler: { receivedPolicy = $0 })
+        XCTAssertEqual(receivedPolicy, WKNavigationActionPolicy.cancel)
+        
+        let fakeAction4 = FakeNavigationAction(testRequest: URLRequest.init(url: URL(string: "https://www.walmart.com/signin")!))
+        vc.webView(vc.webView, decidePolicyFor: fakeAction4, decisionHandler: { receivedPolicy = $0 })
         XCTAssertEqual(receivedPolicy, WKNavigationActionPolicy.allow)
         
+        let fakeAction6 = FakeNavigationAction(testRequest: URLRequest.init(url: URL(string: "https://tap.walmart.com/signin")!))
+        vc.webView(vc.webView, decidePolicyFor: fakeAction6, decisionHandler: { receivedPolicy = $0 })
+        XCTAssertEqual(receivedPolicy, WKNavigationActionPolicy.allow)
         
-        let fakeAction2 = FakeNavigationAction(testRequest: URLRequest.init(url: URL(string: ViewController.Paths.k.rawValue)!))
-        vc.webView(vc.webView, decidePolicyFor: fakeAction2, decisionHandler: { receivedPolicy = $0})
+        let fakeAction5 = FakeNavigationAction(testRequest: URLRequest.init(url: URL(string: "https://www.google.com")!))
+        vc.webView(vc.webView, decidePolicyFor: fakeAction5, decisionHandler: { receivedPolicy = $0 })
         XCTAssertEqual(receivedPolicy, WKNavigationActionPolicy.cancel)
-        
-        
     }
     
-    func test_RequestWithCancel() {
-        var receivedPolicy: WKNavigationActionPolicy?
-
+    func testHandleUrl(){
         let vc = getVC(storyboardName: "Main",controller: ViewController.init())
-        let fakeAction3 = FakeNavigationAction(testRequest: URLRequest.init(url: URL(string: ViewController.Paths.l.rawValue)!))
-        vc.webView(vc.webView, decidePolicyFor: fakeAction3, decisionHandler: { receivedPolicy = $0})
-        XCTAssertEqual(receivedPolicy, WKNavigationActionPolicy.cancel)
+        let val1 = vc.handleInterceptWithUrlString(url: "www.walmart.com/signin", host: "www.walmart.com")
+        XCTAssertFalse(val1)
         
-        let fakeAction4 = FakeNavigationAction(testRequest: URLRequest.init(url: URL(string: ViewController.Paths.m.rawValue)!))
-        vc.webView(vc.webView, decidePolicyFor: fakeAction4, decisionHandler: { receivedPolicy = $0})
-        XCTAssertEqual(receivedPolicy, WKNavigationActionPolicy.cancel)
+        let val2 = vc.handleInterceptWithUrlString(url: "www.walmart.com/signin", host: nil)
+        XCTAssertTrue(val2)
     }
     
     private func getVC<T:UIViewController>(storyboardName: String, controller:T)->T{

@@ -21,37 +21,53 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let url = URL(string: Paths.baseUrl.rawValue)!
+        let url = URL(string: "https://www.walmart.com")!
         webView.load(URLRequest(url: url))
-//        webView.allowsBackForwardNavigationGestures = true
+        webView.allowsBackForwardNavigationGestures = true
     }
-
-
 }
 
 extension ViewController:WKNavigationDelegate{
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        print("URL navigated :\(String(describing: navigationAction.request.url))")
+        print("URL :\(String(describing: navigationAction.request.url))")
         
-        handleUrl(urlString: navigationAction.request.url?.absoluteString) ? decisionHandler(.cancel) : decisionHandler(.allow)
+        let url = navigationAction.request.url?.absoluteString
+        let urlHost = navigationAction.request.url?.host
+        
+        let isIntercepted = self.handleInterceptWithUrlString(url: url, host: urlHost)
+        
+        if isIntercepted {
+            decisionHandler(.cancel)
+            return
+        }
+
+        /// if html's link is <a href="_blank"...> then try to open in same page
+        if navigationAction.targetFrame == nil {
+            webView.load(navigationAction.request)
+        }
+        decisionHandler(.allow)
     }
 }
 
 extension ViewController {
     enum Paths:String {
-        case baseUrl = "https://www.hackingwithswift.com"
-        case k = "/forums"
-        case l = "/example-code"
-        case m = "/learn"
+        case kWMAddressPath = "/plus/address"
+        case kWMSignUpPath = "/plus/signup"
+        case kWMTrialPath = "/plus/trial"
     }
     
-    private func handleUrl(urlString: String?)->Bool {
-        if let url = urlString {
-            if url.contains(Paths.k.rawValue) || url.contains(Paths.l.rawValue) || url.contains(Paths.m.rawValue) {
-                return true
-            }
+    func handleInterceptWithUrlString(url: String?, host: String?) -> Bool {
+        guard let host = host, let url = url else {
+            return true
         }
         
+        guard host.hasSuffix(".walmart.com") else {
+            return true
+        }
+        
+        if url.contains(Paths.kWMAddressPath.rawValue) || url.contains(Paths.kWMSignUpPath.rawValue) || url.contains(Paths.kWMTrialPath.rawValue) {
+            return true
+        }
         return false
     }
 }
